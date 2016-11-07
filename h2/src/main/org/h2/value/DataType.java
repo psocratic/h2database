@@ -388,7 +388,7 @@ public class DataType {
         add(Value.ENUM, Types.OTHER, "Enum",
                 createEnum(),
                 new String[]{"ENUM"},
-                28
+                48
         );
         for (Integer i : TYPES_BY_VALUE_TYPE.keySet()) {
             Value.getOrder(i);
@@ -468,6 +468,8 @@ public class DataType {
     private static DataType createEnum() {
         DataType dataType = createString(false);
         dataType.supportsPermittedValues = true;
+        dataType.supportsPrecision = false;
+        dataType.supportsScale = false;
         return dataType;
     }
     private static DataType createString(boolean caseSensitive) {
