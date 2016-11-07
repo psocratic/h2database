@@ -2,9 +2,9 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.h2database</groupId>
+  <groupId>com.psocratic</groupId>
   <artifactId>h2</artifactId>
-  <version>1.4.193-SNAPSHOT</version>
+  <version>1.4.194-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>H2 Database Engine</name>
   <url>http://www.h2database.com</url>
@@ -19,9 +19,22 @@
   </licenses>
 
   <scm>
-    <connection>scm:git:https://github.com/h2database/h2database</connection>
-    <url>https://github.com/h2database/h2database</url>
+    <connection>scm:git:git@github.com:psocratic/h2database.git</connection>
+    <developerConnection>scm:git:git@github.com:psocratic/h2database.git</developerConnection>
   </scm>
+
+  <distributionManagement>
+    <repository>
+      <id>psocratic-release-repo</id>
+      <name>Psocratic Release Repository</name>
+      <url>s3://artifact.psocratic.com/release</url>
+    </repository>
+    <snapshotRepository>
+      <id>psocratic-snapshot-repo</id>
+      <name>Psocratic Snapshot Repository</name>
+      <url>s3://artifact.psocratic.com/snapshot</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <developers>
     <developer>
@@ -164,7 +177,25 @@
     </profile>
   </profiles>
 
+  <repositories>
+    <repository>
+      <id>confluent</id>
+      <url>http://packages.confluent.io/maven</url>
+    </repository>
+    <repository>
+      <id>psocratic-release-repo</id>
+      <url>s3://artifact.psocratic.com/release</url>
+    </repository>
+  </repositories>
+
   <build>
+    <extensions>
+      <extension>
+        <groupId>org.springframework.build</groupId>
+        <artifactId>aws-maven</artifactId>
+        <version>5.0.0.RELEASE</version>
+      </extension>
+    </extensions>
     <sourceDirectory>src/main</sourceDirectory>
     <testSourceDirectory>src/test</testSourceDirectory>
     <!-- Resources do not follow maven project layout. We need to manually copy them -->
@@ -234,6 +265,7 @@
         </configuration>
       </plugin>
       <!-- Make sure we are not using anything outside JDK 1.6 -->
+      <!--
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
@@ -254,6 +286,33 @@
             <version>1.1</version>
           </signature>
         </configuration>
+      </plugin>
+      -->
+      <plugin>
+        <artifactId>maven-scm-plugin</artifactId>
+        <version>1.9.4</version>
+        <configuration>
+          <tag>v${project.version}</tag>
+        </configuration>
+      </plugin>
+      <plugin>
+         <groupId>de.jutzig</groupId>
+         <artifactId>github-release-plugin</artifactId>
+         <version>1.1.1</version>
+         <executions>
+           <execution>
+             <id>github-release</id>
+             <goals>
+               <goal>release</goal>
+             </goals>
+             <phase>deploy</phase>
+             <configuration>
+               <description>${release.description}</description>
+               <releaseName>v${project.version}</releaseName>
+               <tag>v${project.version}</tag>
+             </configuration>
+           </execution>
+         </executions>
       </plugin>
       <!-- Disable surefire since we don't use Junit -->
       <plugin>
